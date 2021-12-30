@@ -32,29 +32,31 @@ class OrbitControls extends EventDispatcher {
 		this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
 
+		const globalSpeed = 0.05;
+
 		// Set to false to disable this control
 		this.enabled = true;
 
 		// "target" sets the location of focus, where the object orbits around
-		this.target = new Vector3();
+		this.target = new Vector3(-2,18,0);
 
 		// How far you can dolly in and out ( PerspectiveCamera only )
-		this.minDistance = 98;
-		this.maxDistance = 99;
+		this.minDistance = 57;
+		this.maxDistance = 58;
 
 		// How far you can zoom in and out ( OrthographicCamera only )
-		this.minZoom = 75;
-		this.maxZoom = 125;
+		this.minZoom = 0;
+		this.maxZoom = Infinity;
 
 		// How far you can orbit vertically, upper and lower limits.
 		// Range is 0 to Math.PI radians.
-		this.minPolarAngle = Math.PI/6; // radians
-		this.maxPolarAngle = Math.PI/6; // radians
+		this.minPolarAngle = 1.35; // radians
+		this.maxPolarAngle = Math.PI; // radians
 
 		// How far you can orbit horizontally, upper and lower limits.
 		// If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI )
-		this.minAzimuthAngle = 1; // radians
-		this.maxAzimuthAngle = 1.25; // radians
+		this.minAzimuthAngle = - 0.05; // radians
+		this.maxAzimuthAngle = 0.12; // radians
 
 		// Set to true to enable damping (inertia)
 		// If damping is enabled, you must call controls.update() in your animation loop
@@ -64,26 +66,22 @@ class OrbitControls extends EventDispatcher {
 		// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 		// Set to false to disable zooming
 		this.enableZoom = true;
-		this.zoomSpeed = 0.75;
+		this.zoomSpeed = globalSpeed;
 
 		// Set to false to disable rotating
 		this.enableRotate = true;
-		this.rotateSpeed = 0.75;
+		this.rotateSpeed = globalSpeed;
 
 		// Set to false to disable panning
-		this.enablePan = false;
-		this.panSpeed = 0.1;
+		this.enablePan = true;
+		this.panSpeed = 1.0;
 		this.screenSpacePanning = true; // if false, pan orthogonal to world-space direction camera.up
 		this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
-		// Custom animation
-		this.autoFocus = true;
-		this.autoFocusSpeed = 0.1; // 30 seconds per orbit when fps is 60
-
 		// Set to true to automatically rotate around the target
 		// If auto-rotate is enabled, you must call controls.update() in your animation loop
-		this.autoRotate = false;
-		this.autoRotateSpeed = 0.1; // 30 seconds per orbit when fps is 60
+		this.autoRotate = true;
+		this.autoRotateSpeed = globalSpeed; // 30 seconds per orbit when fps is 60
 
 		// The four arrow keys
 		this.keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' };
@@ -180,12 +178,6 @@ class OrbitControls extends EventDispatcher {
 				// angle from z-axis around y-axis
 				spherical.setFromVector3( offset );
 
-				if ( scope.autoFocus && state === STATE.NONE ) {
-
-					rotateLeft( getAutoFocusAngle() );
-
-				}
-
 				if ( scope.autoRotate && state === STATE.NONE ) {
 
 					rotateLeft( getAutoRotationAngle() );
@@ -233,6 +225,7 @@ class OrbitControls extends EventDispatcher {
 				spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
 
 				spherical.makeSafe();
+
 
 				spherical.radius *= scale;
 
@@ -366,12 +359,6 @@ class OrbitControls extends EventDispatcher {
 
 		const pointers = [];
 		const pointerPositions = {};
-
-		function getAutoFocusAngle() {
-
-			return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
-
-		}
 
 		function getAutoRotationAngle() {
 
@@ -1238,5 +1225,30 @@ class OrbitControls extends EventDispatcher {
 }
 
 
+// This set of controls performs orbiting, dollying (zooming), and panning.
+// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
+// This is very similar to OrbitControls, another set of touch behavior
+//
+//    Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
+//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+//    Pan - left mouse, or arrow keys / touch: one-finger move
 
-export { OrbitControls };
+class MapControls extends OrbitControls {
+
+	constructor( object, domElement ) {
+
+		super( object, domElement );
+
+		this.screenSpacePanning = false; // pan orthogonal to world-space direction camera.up
+
+		this.mouseButtons.LEFT = MOUSE.PAN;
+		this.mouseButtons.RIGHT = MOUSE.ROTATE;
+
+		this.touches.ONE = TOUCH.PAN;
+		this.touches.TWO = TOUCH.DOLLY_ROTATE;
+
+	}
+
+}
+
+export { OrbitControls, MapControls };
