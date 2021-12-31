@@ -118,7 +118,7 @@ function init() {
   // load a resource
   loader.load(
     // resource URL
-    "../3d/BuildingBake4.glb",
+    "../3d/BuildingBake3.glb",
     // called when resource is loaded
     (object) => {
       console.log(object.scene);
