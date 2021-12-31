@@ -32,7 +32,7 @@ class OrbitControls extends EventDispatcher {
 		this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
 
-		const globalSpeed = 0.05;
+		const globalSpeed = 0.085;
 
 		// Set to false to disable this control
 		this.enabled = true;
@@ -41,8 +41,8 @@ class OrbitControls extends EventDispatcher {
 		this.target = new Vector3(-2,18,0);
 
 		// How far you can dolly in and out ( PerspectiveCamera only )
-		this.minDistance = 57;
-		this.maxDistance = 58;
+		this.minDistance = 42;
+		this.maxDistance = 57;
 
 		// How far you can zoom in and out ( OrthographicCamera only )
 		this.minZoom = 0;
@@ -55,8 +55,8 @@ class OrbitControls extends EventDispatcher {
 
 		// How far you can orbit horizontally, upper and lower limits.
 		// If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI )
-		this.minAzimuthAngle = - 0.05; // radians
-		this.maxAzimuthAngle = 0.12; // radians
+		this.minAzimuthAngle = - 0.15; // radians  - Infinity
+		this.maxAzimuthAngle = 0.22; // radians  Infinity
 
 		// Set to true to enable damping (inertia)
 		// If damping is enabled, you must call controls.update() in your animation loop
@@ -73,7 +73,7 @@ class OrbitControls extends EventDispatcher {
 		this.rotateSpeed = globalSpeed;
 
 		// Set to false to disable panning
-		this.enablePan = true;
+		this.enablePan = false;
 		this.panSpeed = 1.0;
 		this.screenSpacePanning = true; // if false, pan orthogonal to world-space direction camera.up
 		this.keyPanSpeed = 7.0;	// pixels moved per arrow key push

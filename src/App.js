@@ -1,11 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "./OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper.js";
 // import { app } from "./firebase";
 import "./App.css";
 
-let camera, controls, scene, renderer;
+let camera, controls, scene, renderer, model, mouse;
 
 init();
 //render(); // remove when using next line for animation loop (requestAnimationFrame)
@@ -13,13 +12,28 @@ animate();
 
 function init() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xcccccc);
+  // Background
+
+  scene.background = new THREE.TextureLoader().load("./bg.png");
+
+  console.log("scene bg")
+  console.log(scene.background)
+
+  // scene.background = new THREE.Color(0xcccccc);
   // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+
+  mouse = {
+    x: 0,
+    y: 0,
+  };
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
+
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.BasicShadowMap;
 
   camera = new THREE.PerspectiveCamera(
     60,
@@ -32,6 +46,7 @@ function init() {
   // controls
 
   controls = new OrbitControls(camera, renderer.domElement);
+
   controls.listenToKeyEvents(window); // optional
 
   //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
@@ -39,45 +54,63 @@ function init() {
   controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
   controls.dampingFactor = 0.05;
 
-  controls.screenSpacePanning = true;
+  controls.screenSpacePanning = false;
 
   // controls.minDistance = 100;
   // controls.maxDistance = 500;
 
-  controls.maxPolarAngle = Math.PI;
-
-  // world
-
-  //   const geometry = new THREE.CylinderGeometry(0, 10, 30, 4, 1);
-  //   const material = new THREE.MeshPhongMaterial({
-  //     color: 0xffffff,
-  //     flatShading: true,
-  //   });
-
-  //   for (let i = 0; i < 500; i++) {
-  //     const mesh = new THREE.Mesh(geometry, material);
-  //     mesh.position.x = Math.random() * 1600 - 800;
-  //     mesh.position.y = 0;
-  //     mesh.position.z = Math.random() * 1600 - 800;
-  //     mesh.updateMatrix();
-  //     mesh.matrixAutoUpdate = false;
-  //     scene.add(mesh);
-  //   }
+  controls.maxPolarAngle = Math.PI / 2;
 
   // lights
 
-  const width = 10;
-  const height = 10;
-  const intensity = 1;
-  const rectLight = new THREE.RectAreaLight(0xffffff, intensity, width, height);
-  rectLight.position.set(-2, 18, 20);
-  rectLight.lookAt(-2, 18, 0);
-  scene.add(rectLight);
+  const intensity = .5;
+  const pointLight = new THREE.PointLight(0xffffff, intensity);
+  pointLight.castShadow = true;
+  pointLight.position.set(-5, 33, 24);
+  // pointLight.lookAt(-2, 18, 0);
+  scene.add(pointLight);
 
-  const rectLightHelper = new RectAreaLightHelper(rectLight);
-  rectLight.add(rectLightHelper);
+  const ambientLight = new THREE.AmbientLight(0xFFD0F7, .45);
+  scene.add(pointLight, ambientLight);
 
+  // const sphereSize = 1;
+  // const pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
+  // scene.add( pointLightHelper );
 
+  // Touch interaction
+
+  const onDocumentTouch = (event) => {
+    // event.preventDefault();
+    event = event.changedTouches[0];
+
+    var rect = renderer.domElement.getBoundingClientRect();
+
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    pointLight.position.copy(
+      new THREE.Vector3(mouse.x * 18, mouse.y * 18 + 32, 24)
+    );
+    console.log(pointLight.position);
+  };
+
+  document.addEventListener("touchmove", onDocumentTouch, false);
+  document.addEventListener("touchstart", onDocumentTouch, false);
+  document.addEventListener("touchend", onDocumentTouch, false);
+
+  document.addEventListener("mousemove", onMouseMove, false);
+
+  // Follows the mouse event
+  function onMouseMove(event) {
+    // Update the mouse variable
+    // event.preventDefault();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    pointLight.position.copy(
+      new THREE.Vector3(mouse.x * 10.45, mouse.y * 2 + 32, 24)
+    );
+  }
 
   // instantiate a loader
   const loader = new GLTFLoader();
@@ -85,12 +118,14 @@ function init() {
   // load a resource
   loader.load(
     // resource URL
-    "../3d/cresent_001.glb",
+    "../3d/BuildingBake4.glb",
     // called when resource is loaded
     (object) => {
-      const model = object.scene;
+      console.log(object.scene);
+      model = object.scene;
       scene.add(model);
-      model.scale.multiplyScalar(12);
+      model.scale.multiplyScalar(7.25);
+      model.position.set(-3, 10, 12);
     },
     // called when loading is in progresses
     function (xhr) {
@@ -101,11 +136,6 @@ function init() {
       console.log(error);
     }
   );
-
-  const streetLight1 = new THREE.PointLight(0x000fff, 0.48); //000fff
-  streetLight1.position.set(0, 250, 175);
-  streetLight1.castShadow = false; // true
-  scene.add(streetLight1);
 
   window.addEventListener("resize", onWindowResize);
 }
