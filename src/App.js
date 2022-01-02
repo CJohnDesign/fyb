@@ -1,8 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "./OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+// import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper.js";
 // import { app } from "./firebase";
 import "./App.css";
+import { AmbientLight } from "three";
 
 let camera, controls, scene, renderer, model, mouse;
 
@@ -16,8 +18,8 @@ function init() {
 
   scene.background = new THREE.TextureLoader().load("./bg.png");
 
-  console.log("scene bg")
-  console.log(scene.background)
+  console.log("scene bg");
+  console.log(scene.background);
 
   // scene.background = new THREE.Color(0xcccccc);
   // scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
@@ -63,19 +65,51 @@ function init() {
 
   // lights
 
-  const intensity = .5;
-  const pointLight = new THREE.PointLight(0xffffff, intensity);
-  pointLight.castShadow = true;
-  pointLight.position.set(-5, 33, 24);
-  // pointLight.lookAt(-2, 18, 0);
-  scene.add(pointLight);
+  const intensity = 2;
+  const sphereSize = 2;
 
-  const ambientLight = new THREE.AmbientLight(0xFFD0F7, .45);
-  scene.add(pointLight, ambientLight);
+  const pointLight = new THREE.PointLight(0xFFFFFF, intensity/3);
+  const streetLight1 = new THREE.PointLight(0xFF9100, intensity * 2.25);
+  const streetLight2 = new THREE.PointLight(0xFF7AAB, intensity * 2);
+  const streetLight3 = new THREE.PointLight(0xFFFFFF, intensity * 1.15);
+  const streetLight4 = new THREE.PointLight(0xFF9100, intensity);
+  const streetLight5 = new THREE.PointLight(0xFF7AAB, intensity);
 
-  // const sphereSize = 1;
-  // const pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
-  // scene.add( pointLightHelper );
+  const posLight = new THREE.Vector3(-11, 24, 24);
+  const posLight1 = new THREE.Vector3(-11, 42, 24);
+  const posLight2 = new THREE.Vector3(14, 0, 24);
+  const posLight3 = new THREE.Vector3(21, 36, 24);
+
+  const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize, 0xffffff);
+  const streetLight1Helper = new THREE.PointLightHelper(streetLight1, sphereSize, 0xffffff);
+  const streetLight2Helper = new THREE.PointLightHelper(streetLight2, sphereSize, 0xffffff);
+  const streetLight3Helper = new THREE.PointLightHelper(streetLight3, sphereSize, 0xffffff);
+  
+  const allLights = [pointLight, streetLight1, streetLight2, streetLight3]
+  const posLights = [posLight, posLight1, posLight2, posLight3, posLight2, posLight1]
+  const helpLights = [pointLightHelper, streetLight1Helper, streetLight2Helper, streetLight3Helper]
+
+  for (let i = 0; i < allLights.length; i++) {
+    scene.add(allLights[i])
+    allLights[i].position.copy(posLights[i]);
+    scene.add(helpLights[i])
+  }
+
+  
+  // scene.add(streetLight1);
+
+
+  
+  // pointLight.position.set(-5, 33, 24);
+  // scene.add(pointLight);
+
+  // ambientLight = new THREE.AmbientLight(0xffffff, 1);
+  // scene.add(pointLight, ambientLight);
+
+  
+  
+
+
 
   // Touch interaction
 
@@ -89,7 +123,7 @@ function init() {
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     pointLight.position.copy(
-      new THREE.Vector3(mouse.x * 18, mouse.y * 18 + 32, 24)
+      new THREE.Vector3(mouse.x * 48, mouse.y * 36 + 22, 22)
     );
     console.log(pointLight.position);
   };
@@ -106,10 +140,10 @@ function init() {
     // event.preventDefault();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
     pointLight.position.copy(
-      new THREE.Vector3(mouse.x * 10.45, mouse.y * 2 + 32, 24)
+      new THREE.Vector3(mouse.x * 48, mouse.y * 36 + 12, 24)
     );
+    console.log(pointLight.position);
   }
 
   // instantiate a loader
@@ -118,14 +152,35 @@ function init() {
   // load a resource
   loader.load(
     // resource URL
-    "../3d/BuildingBake3.glb",
+    "./CrescentBuilding.glb",
     // called when resource is loaded
     (object) => {
       console.log(object.scene);
       model = object.scene;
       scene.add(model);
       model.scale.multiplyScalar(7.25);
-      model.position.set(-3, 10, 12);
+      model.position.set(0, 10, 12);
+      model.traverse(function (o) {
+        if (o.isMesh) {
+          console.log(o)
+
+          // Roughness
+          if (o.name.substring(0, 3) !== "dow") {
+          o.material.roughness = 10
+          } else {
+            o.material.roughness = 0.1
+          }
+
+          // Shadows
+          if (o.name.substring(0, 3) === "bui") {
+            o.receiveShadow = true;
+          } else if (o.name.substring(0, 3) === "awn") {
+            o.castShadow = true;
+          }
+          
+          
+        }
+      });
     },
     // called when loading is in progresses
     function (xhr) {
