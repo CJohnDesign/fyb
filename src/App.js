@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "./OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-// import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper.js";
 // import { app } from "./firebase";
 import "./App.css";
 import { AmbientLight } from "three";
@@ -65,27 +64,27 @@ function init() {
 
   // lights
 
-  const intensity = 2;
-  const sphereSize = 2;
+  const intensity = .4;
+  const sphereSize = 1;
 
-  const pointLight = new THREE.PointLight(0xFFFFFF, intensity/3);
-  const streetLight1 = new THREE.PointLight(0xFF9100, intensity * 2.25);
-  const streetLight2 = new THREE.PointLight(0xFF7AAB, intensity * 2);
-  const streetLight3 = new THREE.PointLight(0xFFFFFF, intensity * 1.15);
-  const streetLight4 = new THREE.PointLight(0xFF9100, intensity);
-  const streetLight5 = new THREE.PointLight(0xFF7AAB, intensity);
+  const pointLight = new THREE.PointLight(0xFFFFFF, intensity * 1.75);
+  const streetLight1 = new THREE.PointLight(0xFF9100, intensity * 4);
+  const streetLight2 = new THREE.PointLight(0xFF7AAB, intensity * 2.25);
+  const streetLight3 = new THREE.PointLight(0xFFFFFF, intensity * 1.25);
+  const streetLight4 = new THREE.PointLight(0xFF9100, intensity/4);
+  const streetLight5 = new THREE.PointLight(0xFF7AAB, intensity/4);
 
-  const posLight = new THREE.Vector3(-11, 24, 24);
-  const posLight1 = new THREE.Vector3(-11, 42, 24);
-  const posLight2 = new THREE.Vector3(14, 0, 24);
-  const posLight3 = new THREE.Vector3(21, 36, 24);
+  const posLight = new THREE.Vector3(2.5, 27.3, 8.5);
+  const posLight1 = new THREE.Vector3(-11, 42, 12);
+  const posLight2 = new THREE.Vector3(14, 0, 12);
+  const posLight3 = new THREE.Vector3(21, 36, 12);
 
   const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize, 0xffffff);
   const streetLight1Helper = new THREE.PointLightHelper(streetLight1, sphereSize, 0xffffff);
   const streetLight2Helper = new THREE.PointLightHelper(streetLight2, sphereSize, 0xffffff);
   const streetLight3Helper = new THREE.PointLightHelper(streetLight3, sphereSize, 0xffffff);
   
-  const allLights = [pointLight, streetLight1, streetLight2, streetLight3]
+  const allLights = [pointLight, streetLight1, streetLight2, streetLight3, streetLight4, streetLight5]
   const posLights = [posLight, posLight1, posLight2, posLight3, posLight2, posLight1]
   const helpLights = [pointLightHelper, streetLight1Helper, streetLight2Helper, streetLight3Helper]
 
@@ -123,9 +122,9 @@ function init() {
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
     pointLight.position.copy(
-      new THREE.Vector3(mouse.x * 48, mouse.y * 36 + 22, 22)
+      new THREE.Vector3(mouse.x * 36, mouse.y * 36 + 22, 8.5)
     );
-    console.log(pointLight.position);
+    // console.log(pointLight.position);
   };
 
   document.addEventListener("touchmove", onDocumentTouch, false);
@@ -141,9 +140,9 @@ function init() {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     pointLight.position.copy(
-      new THREE.Vector3(mouse.x * 48, mouse.y * 36 + 12, 24)
+      new THREE.Vector3(mouse.x * 36, mouse.y * 36 + 22, 8.5)
     );
-    console.log(pointLight.position);
+    // console.log(pointLight.position);
   }
 
   // instantiate a loader
@@ -152,14 +151,14 @@ function init() {
   // load a resource
   loader.load(
     // resource URL
-    "./CrescentBuilding.glb",
+    "./Crescent_1.glb",
     // called when resource is loaded
     (object) => {
       console.log(object.scene);
       model = object.scene;
       scene.add(model);
       model.scale.multiplyScalar(7.25);
-      model.position.set(0, 10, 12);
+      model.position.set(2, 8, 2);
       model.traverse(function (o) {
         if (o.isMesh) {
           console.log(o)

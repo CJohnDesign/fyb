@@ -32,17 +32,17 @@ class OrbitControls extends EventDispatcher {
 		this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
 
-		const globalSpeed = 0.035;
+		const globalSpeed = 0.15;
 
 		// Set to false to disable this control
 		this.enabled = true;
 
 		// "target" sets the location of focus, where the object orbits around
-		this.target = new Vector3(-2,18,0);
+		this.target = new Vector3(0,18,0);
 
 		// How far you can dolly in and out ( PerspectiveCamera only )
-		this.minDistance = 56;
-		this.maxDistance = 56;
+		this.minDistance = 11;
+		this.maxDistance = 44;
 
 		// How far you can zoom in and out ( OrthographicCamera only )
 		this.minZoom = 0;
@@ -50,23 +50,23 @@ class OrbitControls extends EventDispatcher {
 
 		// How far you can orbit vertically, upper and lower limits.
 		// Range is 0 to Math.PI radians.
-		this.minPolarAngle = 1.5; // radians
+		this.minPolarAngle = 1.32; // radians
 		this.maxPolarAngle = Math.PI; // radians
 
 		// How far you can orbit horizontally, upper and lower limits.
 		// If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI )
-		this.minAzimuthAngle = - 0.085; // radians  - Infinity
-		this.maxAzimuthAngle = 0.082; // radians  Infinity
+		this.minAzimuthAngle = - 0.24; // radians  - Infinity
+		this.maxAzimuthAngle = 0.28; // radians  Infinity
 
 		// Set to true to enable damping (inertia)
 		// If damping is enabled, you must call controls.update() in your animation loop
-		this.enableDamping = false;
+		this.enableDamping = true;
 		this.dampingFactor = 0.05;
 
 		// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 		// Set to false to disable zooming
 		this.enableZoom = true;
-		this.zoomSpeed = globalSpeed;
+		this.zoomSpeed = globalSpeed * 4;
 
 		// Set to false to disable rotating
 		this.enableRotate = true;
@@ -81,7 +81,7 @@ class OrbitControls extends EventDispatcher {
 		// Set to true to automatically rotate around the target
 		// If auto-rotate is enabled, you must call controls.update() in your animation loop
 		this.autoRotate = true;
-		this.autoRotateSpeed = globalSpeed * 8; // 30 seconds per orbit when fps is 60
+		this.autoRotateSpeed = globalSpeed * 2; // 30 seconds per orbit when fps is 60
 
 		// The four arrow keys
 		this.keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' };
